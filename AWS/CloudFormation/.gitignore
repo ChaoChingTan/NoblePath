@@ -1,2 +1,5 @@
 # ignore ALL .yml files
 *.yml
+
+# ignore sensitive files
+*.secret
