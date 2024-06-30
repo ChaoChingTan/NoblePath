@@ -1,0 +1,45 @@
+# AWSTemplateFormatVersion
+# '2010-09-09' is the only valid version
+#
+# Create IAM Users 
+# Attach to Group - PLPStudents
+# Group policy attached - IAMUserChangePassword which allows user to change own password on first login
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Example CloudFormation template to create a IAM users
+
+Resources:
+  MyGroup:
+    Type: 'AWS::IAM::Group'
+    Properties: 
+      GroupName: {{ group_name }}
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/IAMUserChangePassword'
+      Policies:
+        - PolicyName: ManageOwnAccessKeys
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: "ManageOwnAccessKeys"
+                Effect: "Allow"
+                Action:
+                  - "iam:CreateAccessKey"
+                  - "iam:DeleteAccessKey"
+                  - "iam:GetAccessKeyLastUsed"
+                  - "iam:GetUser"
+                  - "iam:ListAccessKeys"
+                  - "iam:UpdateAccessKey"
+                  - "iam:TagUser"
+                Resource: "arn:aws:iam::*:user/${aws:username}"
+
+{% for i in range(num_users) %}
+  MyUser{{ i + 1 }}:
+    Type: AWS::IAM::User
+    DependsOn: MyGroup
+    Properties:
+      UserName: {{ user_prefix }}{{ i + 1 }}
+      Groups:
+        - Ref: MyGroup
+      LoginProfile:
+        Password: {{ init_pass }}
+        PasswordResetRequired: true
+{% endfor %}
