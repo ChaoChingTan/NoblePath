@@ -11,6 +11,7 @@ load_dotenv(find_dotenv('.env.secret'))
 # Load environment variables
 group_name = os.getenv('GROUP_NAME', 'MyIAMGroup')
 num_users = int(os.getenv('NUM_USERS', 1))
+user_prefix = os.getenv('USERPREFIX','CFTuser')
 init_pass = os.getenv('INITPASS')
 ##account_id = os.getenv('ACCOUNT_ID')
 
@@ -25,6 +26,6 @@ env = Environment(loader=file_loader)
 template = env.get_template(templateFile)
 
 # Render the template with multiple environment variables
-output = template.render(group_name=group_name, num_users=num_users, init_pass=init_pass)
+output = template.render(group_name=group_name, num_users=num_users, user_prefix=user_prefix, init_pass=init_pass)
 
 print(output)
