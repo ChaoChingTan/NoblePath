@@ -2,8 +2,13 @@
 # '2010-09-09' is the only valid version
 #
 # Create IAM Users 
-# Attach to Group - PLPStudents
-# Group policy attached - IAMUserChangePassword which allows user to change own password on first login
+# Attach to Group - passed in as group_name
+# Group policy attached: 
+# - IAMUserChangePassword which allows user to change own password on first login
+# - AWSCloud9User
+# - AWSCloudShellFullAccess
+# - Inline Policy ManageOwnAccessKeys
+
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Example CloudFormation template to create a IAM users
 
@@ -14,6 +19,8 @@ Resources:
       GroupName: {{ group_name }}
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/IAMUserChangePassword'
+        - 'arn:aws:iam::aws:policy/AWSCloud9User'
+        - 'arn:aws:iam::aws:policy/AWSCloudShellFullAccess'
       Policies:
         - PolicyName: ManageOwnAccessKeys
           PolicyDocument:
