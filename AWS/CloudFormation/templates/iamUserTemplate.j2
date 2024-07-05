@@ -22,6 +22,18 @@ Resources:
         - 'arn:aws:iam::aws:policy/AWSCloud9User'
         - 'arn:aws:iam::aws:policy/AWSCloudShellFullAccess'
       Policies:
+        - PolicyName: LimitRegion
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: "LimitRegion"
+                Effect: Deny
+                Action:
+                - cloud9:CreateEnvironmentEC2
+                Resource: "*"
+                Condition:
+                  StringNotEquals:
+                    aws:RequestedRegion: "ap-southeast-1"             
         - PolicyName: ManageOwnAccessKeys
           PolicyDocument:
             Version: "2012-10-17"
