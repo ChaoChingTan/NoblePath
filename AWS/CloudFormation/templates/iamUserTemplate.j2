@@ -10,7 +10,7 @@
 # - Inline Policy ManageOwnAccessKeys
 
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Example CloudFormation template to create a IAM users
+Description: Example CloudFormation template to create IAM users
 
 Resources:
   MyGroup:
@@ -21,6 +21,7 @@ Resources:
         - 'arn:aws:iam::aws:policy/IAMUserChangePassword'
         - 'arn:aws:iam::aws:policy/AWSCloud9User'
         - 'arn:aws:iam::aws:policy/AWSCloudShellFullAccess'
+        - 'arn:aws:iam::aws:policy/AWSIoTFullAccess'
       Policies:
         - PolicyName: LimitRegion
           PolicyDocument:
