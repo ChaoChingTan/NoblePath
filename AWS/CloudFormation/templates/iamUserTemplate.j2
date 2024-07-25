@@ -19,10 +19,21 @@ Resources:
       GroupName: {{ group_name }}
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/IAMUserChangePassword'
+        - 'arn:aws:iam::aws:policy/IAMReadOnlyAccess'
         - 'arn:aws:iam::aws:policy/AWSCloud9User'
         - 'arn:aws:iam::aws:policy/AWSCloudShellFullAccess'
         - 'arn:aws:iam::aws:policy/AWSIoTFullAccess'
+        - 'arn:aws:iam::aws:policy/AmazonSNSFullAccess'
       Policies:
+        - PolicyName: IOTLabPassRole
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: "IOTLabPassRole"
+                Effect: Allow
+                Action:
+                - iam:PassRole
+                Resource: "arn:aws:iam::*:role/738IOTCS*"
         - PolicyName: LimitRegion
           PolicyDocument:
             Version: "2012-10-17"
