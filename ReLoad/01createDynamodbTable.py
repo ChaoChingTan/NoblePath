@@ -98,11 +98,9 @@ if __name__ == "__main__":
     sort_key_name = os.getenv("SORT_KEY_NAME", "DefaultSortKey")
 
     table_info = create_dynamodb_table(
-        table_name="TestTableWithoutLSI",
-        partition_key_name="UserId",
-        sort_key_name="CreatedAt",
-        partition_key_type='S',
-        sort_key_type='S',
-        region_name='us-east-1'
+        table_name,
+        partition_key_name,
+        sort_key_name
     )
+    
     print("Table Description:", table_info)
