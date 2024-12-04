@@ -1,5 +1,7 @@
 # ignore ALL .yml files
 *.yml
+.env
+.gitignore
 
 # ignore sensitive files
 *.secret
