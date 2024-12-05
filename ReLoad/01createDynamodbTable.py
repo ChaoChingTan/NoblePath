@@ -9,7 +9,7 @@ def create_dynamodb_table(
     table_name,
     partition_key_name,
     sort_key_name,
-    partition_key_type='N',
+    partition_key_type='S',
     sort_key_type='S',
     lsi_name=None,
     lsi_sort_key_name=None,
