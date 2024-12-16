@@ -19,9 +19,9 @@ resource "aws_dynamodb_table" "grp_table" {
     type = "S"
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+#  lifecycle {
+#    prevent_destroy = true
+#  }
 }
 
 resource "aws_dynamodb_table" "ta_table" {
@@ -41,9 +41,9 @@ resource "aws_dynamodb_table" "ta_table" {
     type = "S"
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+#  lifecycle {
+#    prevent_destroy = true
+#  }
 }
 
 resource "aws_dynamodb_table" "stf_table" {
@@ -73,10 +73,9 @@ resource "aws_dynamodb_table" "stf_table" {
     projection_type = "ALL"
 
     range_key = "acadsec"
-    # hash_key  = "staff" # Corrected placement of hash_key
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+#  lifecycle {
+#    prevent_destroy = true
+#  }
 }
