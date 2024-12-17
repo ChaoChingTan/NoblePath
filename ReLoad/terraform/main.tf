@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_ssm_parameter" "grp_table_name" {
-  name  = "/${var.app}/${var.env}/${var.pref}_GRP_${var.env}"
+  name  = "/${var.app}/${var.env}/grp_table"
   type  = "String"
   value = "${var.pref}_GRP_${var.env}"
 }
