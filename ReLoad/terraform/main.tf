@@ -2,6 +2,12 @@ provider "aws" {
   region = var.region
 }
 
+resource "aws_ssm_parameter" "grp_table_name" {
+  name  = "/${var.app}/${var.env}/${var.pref}_GRP_${var.env}"
+  type  = "String"
+  value = "${var.pref}_GRP_${var.env}"
+}
+
 resource "aws_dynamodb_table" "grp_table" {
   name         = "${var.pref}_GRP_${var.env}"
   billing_mode = "PAY_PER_REQUEST"
