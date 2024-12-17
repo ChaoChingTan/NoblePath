@@ -5,7 +5,7 @@ provider "aws" {
 resource "aws_ssm_parameter" "grp_table_name" {
   name  = "/${var.app}/${var.env}/grp_table"
   type  = "String"
-  value = "${var.pref}_GRP_${var.env}"
+  value = aws_dynamodb_table.grp_table.name
 }
 
 resource "aws_dynamodb_table" "grp_table" {
