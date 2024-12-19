@@ -18,8 +18,14 @@ variable "app" {
   type        = string
 }
 
-variable "user_count" {
-  description = "Number of users to create"
-  type = number
-  default = 2
+#variable "user_count" {
+#  description = "Number of users to create"
+#  type = number
+#  default = 2
+#}
+
+variable "iam_users_grouping" {
+  type = list(object({
+    username = string
+  }))
 }
