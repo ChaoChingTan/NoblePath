@@ -31,12 +31,13 @@ resource "aws_iam_group_policy_attachment" "grouping_policy_attach" {
 }
 
 resource "aws_iam_user" "grouping_user" {
-  name = "${var.env}grouping"
+  count = var.user_count
+  name = "${var.env}grouping${count.index +1}"
   path = "/${var.app}/${var.env}/"
 }
 
 resource "aws_iam_group_membership" "grouping_membership" {
   name  = "grouping_membership"
   group = aws_iam_group.grouping.name
-  users = [aws_iam_user.grouping_user.name]
+  users = [for user in aws_iam_user.grouping_user : user.name]
 }
