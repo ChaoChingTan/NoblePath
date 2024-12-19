@@ -8,6 +8,12 @@ resource "aws_ssm_parameter" "grp_table_name" {
   value = aws_dynamodb_table.grp_table.name
 }
 
+resource "aws_ssm_parameter" "ta_table_name" {
+  name  = "/${var.app}/${var.env}/ta_table"
+  type  = "String"
+  value = aws_dynamodb_table.ta_table.name
+}
+
 resource "aws_dynamodb_table" "grp_table" {
   name         = "${var.pref}_GRP_${var.env}"
   billing_mode = "PAY_PER_REQUEST"
