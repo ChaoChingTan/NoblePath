@@ -35,6 +35,42 @@ resource "aws_iam_policy" "grp_table_readonly" {
   })
 }
 
+resource "aws_iam_policy" "ta_table_readonly" {
+  name        = "ta_table_readonly_policy"
+  description = "IAM policy for readonly access to ta_table"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action   = [
+          "dynamodb:DescribeTable",
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:Scan"
+        ]
+        Effect   = "Allow",
+        Resource = aws_dynamodb_table.ta_table.arn
+      },
+      {
+        "Action": [
+          "dynamodb:DescribeTable",
+          "dynamodb:ListTables"
+        ],
+        "Effect": "Allow",
+        "Resource": "*",
+        "Condition": {
+          StringEquals: {
+            "aws:RequestedRegion": [
+              "ap-southeast-1"
+            ]
+          }
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_iam_group" "grouping" {
   name = "${var.env}grouping"
   path = "/${var.app}/${var.env}/"
@@ -43,6 +79,11 @@ resource "aws_iam_group" "grouping" {
 resource "aws_iam_group_policy_attachment" "grouping_policy_attach" {
   group      = aws_iam_group.grouping.name
   policy_arn = aws_iam_policy.grp_table_readonly.arn
+}
+
+resource "aws_iam_group_policy_attachment" "grouping_policy_attach_2" {
+  group      = aws_iam_group.grouping.name
+  policy_arn = aws_iam_policy.ta_table_readonly.arn
 }
 
 resource "aws_iam_user" "grouping_user" {
