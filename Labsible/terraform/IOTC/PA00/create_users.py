@@ -53,7 +53,7 @@ def notify_new_users(status):
                 Please use the provided credentials to log in and reset your password on first login.
 
                 Best regards,
-                Admin Team
+                Academy Admin Team
                 """
 
                 # Send email using SES
