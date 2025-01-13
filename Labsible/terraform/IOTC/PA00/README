@@ -1,5 +1,0 @@
-create_users.py
----------------
-Python script to create users according to the "Username" field in the supplied csv file
-Users are created only if they do not already exists
-Email notification will be sent for users created
