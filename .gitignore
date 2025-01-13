@@ -6,6 +6,9 @@
 # ignore sensitive files
 *.secret
 
+# ignore data files
+*.csv
+
 ## terraform related
 # Local .terraform directories
 **/.terraform/*
