@@ -5,6 +5,7 @@
 
 # ignore sensitive files
 *.secret
+*.pem
 
 # ignore data files
 *.csv
