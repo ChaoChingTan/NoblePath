@@ -28,10 +28,17 @@ ansible [core 2.14.17]
 
 If ansible is not installed, consult the appropriate documentations to set it up prior to proceeding.  
 
+### Ensure containers.podman present
+Check that `containers.podman` ansible collection is installed, otherwise install it by running:
+
+```bash
+ansible-galaxy collection install containers.podman
+```
+
 ## RHEL 9 physical machine, managed via ansible
 
 ### Installing software
-The following example playbook installs podman software on the machine:
+The following example playbook installs `podman` on the machine:
 
 ```
 - name: Install software
@@ -44,6 +51,9 @@ The following example playbook installs podman software on the machine:
       name: podman
       state: present
 ```
+
+As `podman-compose` in the example that follows requires `pip`, ensure that it is installed.  
+
 
 We will be running guacamole in container via `podman-compose`.  
 
@@ -258,10 +268,15 @@ The default username is `guacadmin` and the default password is `guacadmin`.
 
 ![Guacamole Settings Screen](./images/guacamole_settings_screen.png)
 
-You can then proceed to setup users and connections for your environment. 
+You can then proceed to setup users and connections for your environment. Refer to the [adminstrator guide](#reference).  
 
 
 ## Conclusion
 In this guide, we have walked through an ansible playbook which automates and initial setup of Apache Guacamole.  
 
 Hope you had fun.
+
+## Reference
+[Apache Guacamole](https://guacamole.apache.org/)
+
+[Apache Guacamole Administration Guide](https://guacamole.apache.org/doc/gug/administration.html)
