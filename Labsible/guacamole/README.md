@@ -251,6 +251,15 @@ localhost                  : ok=11   changed=6    unreachable=0    failed=0    s
 
 You can then access the guacamole web frontend via port 8080.  The path is `/guacamole`, for example:  `http://127.0.0.1:8080/guacamole`
 
+![Guacamole Login Screen](./images/guacamole_login.png)
+
+The default username is `guacadmin` and the default password is `guacadmin`.
+**The first task after login will be to change the default password.**
+
+![Guacamole Settings Screen](./images/guacamole_settings_screen.png)
+
+You can then proceed to setup users and connections for your environment. 
+
 
 ## Conclusion
 In this guide, we have walked through an ansible playbook which automates and initial setup of Apache Guacamole.  
