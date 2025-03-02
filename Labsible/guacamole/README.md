@@ -259,6 +259,15 @@ PLAY RECAP *********************************************************************
 localhost                  : ok=11   changed=6    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
 
+The guacamole services should come up:
+```
+[chao@xtra ~]$ podman ps -a
+CONTAINER ID  IMAGE                                 COMMAND               CREATED        STATUS                  PORTS                             NAMES
+bba8b62212c0  docker.io/library/mysql:8.0           mysqld                2 minutes ago  Up 4 seconds            3306/tcp, 33060/tcp               mysql
+c4aec6ac425f  docker.io/guacamole/guacd:latest      /bin/sh -c /opt/g...  2 minutes ago  Up 4 seconds (healthy)  0.0.0.0:4822->4822/tcp, 4822/tcp  guacd
+ddef990b0cba  docker.io/guacamole/guacamole:latest  /opt/guacamole/bi...  2 minutes ago  Up 4 seconds            0.0.0.0:8080->8080/tcp, 8080/tcp  guacamole
+```
+
 You can then access the guacamole web frontend via port 8080.  The path is `/guacamole`, for example:  `http://127.0.0.1:8080/guacamole`
 
 ![Guacamole Login Screen](./images/guacamole_login.png)
@@ -269,6 +278,9 @@ The default username is `guacadmin` and the default password is `guacadmin`.
 ![Guacamole Settings Screen](./images/guacamole_settings_screen.png)
 
 You can then proceed to setup users and connections for your environment. Refer to the [adminstrator guide](#reference).  
+
+## Caveat
+Note that there is no encryption of traffic to guacamole for this test setup.  Put it behind HTTPS if you are using it for production. 
 
 
 ## Conclusion
