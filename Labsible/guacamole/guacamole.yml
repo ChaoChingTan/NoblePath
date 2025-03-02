@@ -1,0 +1,108 @@
+- name: Install Apache Guacamole on localhost
+  hosts: localhost
+  become: no
+
+  tasks:
+  - name: Install podman and pip
+    become: yes
+    ansible.builtin.package:
+      name:
+        - podman
+        - pip
+      state: present
+
+  - name: Install podman-compose python package
+    ansible.builtin.pip:
+      name: podman-compose
+
+  - name: Download SQL initialization file
+    ansible.builtin.get_url:
+      url: https://raw.githubusercontent.com/ChaoChingTan/NoblePath/refs/heads/master/Labsible/guacamole/initdb.sql
+      dest: ./initdb.sql
+      mode: '0644'
+
+  - name: Create a podman network
+    containers.podman.podman_network:
+      name: guacamole-net
+      driver: bridge
+
+  - name: Ensure MySQL container present and create systemd unit file
+    containers.podman.podman_container:
+      name: mysql
+      image: docker.io/mysql:8.0
+      state: stopped
+      volume:
+        -  ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:Z
+        - guac-mysql-data:/var/lib/mysql
+        - guac-schema:/tmp/schema
+      env:
+        MYSQL_ROOT_PASSWORD: "password"
+        MYSQL_DATABASE: "guacamole_db"
+        MYSQL_USER: "guacamole"
+        MYSQL_PASSWORD: "password"
+      network:
+        - guacamole-net
+      generate_systemd:
+        path: ~/.config/systemd/user/
+        restart_policy: always
+
+
+  - name: Ensure guacd container present and create systemd unit file
+    containers.podman.podman_container:
+      name: guacd
+      image: docker.io/guacamole/guacd
+      state: stopped
+      ports:
+        -  "4822:4822"
+      network:
+        - guacamole-net
+      generate_systemd:
+        path: ~/.config/systemd/user/
+        restart_policy: always
+        wants: container-mysql
+
+  - name: Ensure guacamole container present and create systemd unit file
+    containers.podman.podman_container:
+      name: guacamole
+      image: docker.io/guacamole/guacamole
+      state: stopped
+      ports:
+        -  "8080:8080"
+      env:
+        GUACD_HOSTNAME: "guacd"
+        MYSQL_HOSTNAME: "mysql"
+        MYSQL_PORT: "3306"
+        MYSQL_DATABASE: "guacamole_db"
+        MYSQL_USER: "guacamole"
+        MYSQL_PASSWORD: "password"
+      network:
+        - guacamole-net
+      volume:
+        - guac-config:/config
+      generate_systemd:
+        path: ~/.config/systemd/user/
+        restart_policy: always
+
+  - name: mysql container must be started and enabled on systemd
+    ansible.builtin.systemd:
+      name: container-mysql
+      scope: user
+      daemon_reload: true
+      state: started
+      enabled: true
+
+  - name: guacd container must be started and enabled on systemd
+    ansible.builtin.systemd:
+      name: container-guacd
+      scope: user
+      daemon_reload: true
+      state: started
+      enabled: true
+
+  - name: guacamole container must be started and enabled on systemd
+    ansible.builtin.systemd:
+      name: container-guacamole
+      scope: user
+      daemon_reload: true
+      state: started
+      enabled: true
