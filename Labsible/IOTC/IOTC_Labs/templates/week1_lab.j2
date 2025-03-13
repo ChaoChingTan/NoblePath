@@ -1,0 +1,19 @@
+# Lab Instructions - Week {{ week }}, Lab {{ lab }}
+
+All the following shall be done as a normal (not root) user, {{ user }}.
+Should you require elevated privilege to complete the tasks, use the command `sudo` to accomplish them.
+
+## Task List:
+
+1. Create a folder in your home directory called: {{ base_dir }}
+2. Change working directory to {{ base_dir }}
+3. Copy the file {{ file }} to the folder created in step 1.
+4. Copy the file {{ file2 }} over to the folder created in step 1.
+5. Change the owner of the file {{ file2 }} in the current directory to {{ user }}, and the group owner of the file to {{ group }}.
+6. Change the permission of the file {{ file2 }} to {{ perms }}
+7. Create an empty file called {{ file3 }}
+8. Find the line containing `{{ user }}` in the file `passwd` and redirect this line to file {{ output }}
+9. Find the line containing `{{ user }}` in the file `shadow` and append this line to file {{ output }}
+10. Install the software: {{ software }}
+
+Good luck!
