@@ -29,12 +29,11 @@
   - name: Ensure MySQL container present and create systemd unit file
     containers.podman.podman_container:
       name: mysql
-      image: docker.io/mysql:8.0
+      image: docker.io/mysql
       state: stopped
       volume:
         -  ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:Z
         - guac-mysql-data:/var/lib/mysql
-        - guac-schema:/tmp/schema
       env:
         MYSQL_ROOT_PASSWORD: "password"
         MYSQL_DATABASE: "guacamole_db"
@@ -45,6 +44,8 @@
       generate_systemd:
         path: ~/.config/systemd/user/
         restart_policy: always
+      ports:
+        - "127.0.0.1:3306:3306"
 
 
   - name: Ensure guacd container present and create systemd unit file
@@ -69,6 +70,7 @@
       ports:
         -  "8080:8080"
       env:
+        EXTENSION_PRIORITY: "mysql"
         GUACD_HOSTNAME: "guacd"
         MYSQL_HOSTNAME: "mysql"
         MYSQL_PORT: "3306"
@@ -77,8 +79,6 @@
         MYSQL_PASSWORD: "password"
       network:
         - guacamole-net
-      volume:
-        - guac-config:/config
       generate_systemd:
         path: ~/.config/systemd/user/
         restart_policy: always
@@ -106,3 +106,4 @@
       daemon_reload: true
       state: started
       enabled: true
+
