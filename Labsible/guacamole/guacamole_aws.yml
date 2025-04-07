@@ -1,0 +1,200 @@
+---
+## Before running playbook, ensure keypair labkey created
+## Download .pem file and name it labkey.pem
+## Ensure permission of labkey.pem is 0600
+
+- name: Launch a RHEL instance in AWS with HTTP port and SSH accessible
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Fetch latest RHEL AMI
+      amazon.aws.ec2_ami_info:
+        region: "us-east-1"  # Change as needed
+        owners: "309956199498"  # Red Hat's official AWS account ID
+        filters:
+          name: "RHEL-9.*-x86_64-*"
+          architecture: "x86_64"
+          root-device-type: "ebs"
+          virtualization-type: "hvm"
+      register: rhel_ami
+
+    - name: Select the latest AMI
+      set_fact:
+        latest_ami: "{{ (rhel_ami.images | sort(attribute='creation_date') | last).image_id }}"
+      when: rhel_ami.images | length > 0
+
+    - name: Display AMI ID
+      debug:
+        msg: "Latest RHEL AMI ID: {{ latest_ami }}"
+      when: latest_ami is defined
+
+- name: Create Security Group for Guacamole
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create security group
+      amazon.aws.ec2_security_group:
+        name: "guacamole"
+        description: "Allow SSH and guacamole web server port"
+        region: "us-east-1"
+        rules:
+          - proto: tcp
+            ports: [22, 8080]
+            cidr_ip: "0.0.0.0/0"
+      register: guac_sg
+
+- name: Launch EC2 Instance
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Start EC2 instance
+      amazon.aws.ec2_instance:
+        name: "guacamole"
+        region: "us-east-1"  # Change as needed
+        key_name: "labkey"
+        instance_type: "t3.medium"
+        image_id: "{{ latest_ami }}"
+        network:
+          assign_public_ip: true
+        security_groups: ["guacamole"]
+        wait: yes  # Ensures the instance reaches "running" state
+        wait_timeout: 300
+        count: 1
+      register: guac_instance
+
+    - name: Wait for public IP to be assigned
+      amazon.aws.ec2_instance_info:
+        region: "us-east-1"
+        filters:
+          "instance-id": "{{ guac_instance.instances[0].instance_id }}"
+      register: instance_info
+      until: instance_info.instances[0].public_ip_address is defined
+      retries: 10
+      delay: 5
+
+    - name: Display Instance Details
+      debug:
+        msg: "Instance ID: {{ instance_info.instances[0].instance_id }}, Public IP: {{ instance_info.instances[0].public_ip_address }}"
+
+    - name: Set instance public IP
+      set_fact:
+        instance_public_ip: "{{ instance_info.instances[0].public_ip_address }}"
+
+    - name: Add new instance to inventory
+      add_host:
+        name: "guacamole-instance"
+        ansible_host: "{{ instance_public_ip }}"
+        ansible_user: ec2-user  # for RHEL, user is ec2-user
+        ansible_ssh_private_key_file: "labkey.pem"
+        ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
+- name: Configure Guacamole server
+  hosts: "guacamole-instance"
+  gather_facts: no
+  tasks:
+    - name: Wait for instance to become reachable
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+
+    - name: Install podman and pip
+      become: yes
+      ansible.builtin.package:
+        name:
+          - podman
+          - pip
+        state: present
+
+    - name: Install podman-compose python package
+      ansible.builtin.pip:
+        name: podman-compose
+
+    - name: Download SQL initialization file
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/ChaoChingTan/NoblePath/refs/heads/master/Labsible/guacamole/initdb.sql
+        dest: ./initdb.sql
+        mode: '0644'
+
+    - name: Create a podman network
+      containers.podman.podman_network:
+        name: guacamole-net
+        driver: bridge
+
+    - name: Ensure MySQL container present and create systemd unit file
+      containers.podman.podman_container:
+        name: mysql
+        image: docker.io/mysql
+        state: stopped
+        volume:
+          -  ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:Z
+          - guac-mysql-data:/var/lib/mysql
+        env:
+          MYSQL_ROOT_PASSWORD: "password"
+          MYSQL_DATABASE: "guacamole_db"
+          MYSQL_USER: "guacamole"
+          MYSQL_PASSWORD: "password"
+        network:
+          - guacamole-net
+        generate_systemd:
+          path: ~/.config/systemd/user/
+          restart_policy: always
+        ports:
+          - "127.0.0.1:3306:3306"
+
+    - name: Ensure guacd container present and create systemd unit file
+      containers.podman.podman_container:
+        name: guacd
+        image: docker.io/guacamole/guacd
+        state: stopped
+        ports:
+          -  "4822:4822"
+        network:
+          - guacamole-net
+        generate_systemd:
+          path: ~/.config/systemd/user/
+          restart_policy: always
+          wants: container-mysql
+
+    - name: Ensure guacamole container present and create systemd unit file
+      containers.podman.podman_container:
+        name: guacamole
+        image: docker.io/guacamole/guacamole
+        state: stopped
+        ports:
+          -  "8080:8080"
+        env:
+          EXTENSION_PRIORITY: "mysql"
+          GUACD_HOSTNAME: "guacd"
+          MYSQL_HOSTNAME: "mysql"
+          MYSQL_PORT: "3306"
+          MYSQL_DATABASE: "guacamole_db"
+          MYSQL_USER: "guacamole"
+          MYSQL_PASSWORD: "password"
+        network:
+          - guacamole-net
+        generate_systemd:
+          path: ~/.config/systemd/user/
+          restart_policy: always
+
+    - name: mysql container must be started and enabled on systemd
+      ansible.builtin.systemd:
+        name: container-mysql
+        scope: user
+        daemon_reload: true
+        state: started
+        enabled: true
+
+    - name: guacd container must be started and enabled on systemd
+      ansible.builtin.systemd:
+        name: container-guacd
+        scope: user
+        daemon_reload: true
+        state: started
+        enabled: true
+
+    - name: guacamole container must be started and enabled on systemd
+      ansible.builtin.systemd:
+        name: container-guacamole
+        scope: user
+        daemon_reload: true
+        state: started
+        enabled: true
