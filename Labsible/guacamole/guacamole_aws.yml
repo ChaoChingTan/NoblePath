@@ -198,3 +198,12 @@
         daemon_reload: true
         state: started
         enabled: true
+
+    - name: Enable systemd lingering by creating the linger file
+      become: true
+      ansible.builtin.file:
+        path: /var/lib/systemd/linger/ec2-user
+        state: touch
+        owner: ec2-user
+        group: ec2-user
+        mode: '0644'
