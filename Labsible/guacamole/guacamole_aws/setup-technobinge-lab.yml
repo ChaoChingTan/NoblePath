@@ -1,0 +1,33 @@
+---
+- name: Execute tasks based on each entry from CSV file
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars.yml
+    
+  tasks:
+    - name: Read the CSV file
+      ansible.builtin.read_csv:
+        path: "{{ users_csv }}"
+      register: csv_data
+
+    - name: Get latest Amazon Linux 2023 AMI
+      amazon.aws.ec2_ami_info:
+        owners: ['amazon']
+        filters:
+          name: "al2023-ami-*-x86_64"
+          architecture: "x86_64"
+          root-device-type: "ebs"
+          virtualization-type: "hvm"
+        region: "{{ aws_region }}"
+      register: ami_info
+
+    - name: Set Amazon Linux 2023 AMI ID
+      set_fact:
+        amazon_linux_ami: "{{ ami_info.images[0].image_id }}"
+
+    - name: Loop over each user-host entry
+      ansible.builtin.include_tasks: "{{ include_task_file }}"
+      loop: "{{ csv_data.list }}"
+      loop_control:
+        loop_var: user_info
