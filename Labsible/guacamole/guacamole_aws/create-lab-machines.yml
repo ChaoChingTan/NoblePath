@@ -1,0 +1,56 @@
+
+- name: Get VPC ID from tag "{{ vpc_tag_name }}"
+  amazon.aws.ec2_vpc_net_info:
+    region: "{{ aws_region }}"
+    filters:
+      "tag:Name": "{{ vpc_tag_name }}"
+  register: vpc_info
+
+- name: Gather information about VPC subnets for {{ vpc_tag_name }}
+  amazon.aws.ec2_vpc_subnet_info:
+    filters:
+      vpc-id: "{{ vpc_info.vpcs[0].id }}"
+  register: subnet_info
+
+- name: Set ipaddr according to csv
+  set_fact:
+    ipaddr: "{{ user_info.host }}"
+
+- name: Loop over subnet_info and print subnet_id and cidr
+  set_fact:
+    registered_subnet_id: "{{ item.subnet_id }}"
+  loop: "{{ subnet_info.subnets }}"
+  when: item.cidr_block | ansible.utils.network_in_network(ipaddr)
+
+- name: Fail if no subnet_id was found
+  fail:
+    msg: "No matching subnet_id found for IP address {{ ipaddr }}"
+  when: registered_subnet_id is not defined
+
+- name: Create SSH security group
+  amazon.aws.ec2_security_group:
+    name: "ssh-sg"
+    description: "Allow SSH"
+    vpc_id: "{{ vpc_info.vpcs[0].id }}"
+    region: "{{ aws_region }}"
+    rules:
+      - proto: tcp
+        ports: "{{ ssh_ports }}"
+        cidr_ip: "0.0.0.0/0"
+  register: ssh_sg
+
+- name: start ec2 instance
+  amazon.aws.ec2_instance:
+    name: "{{ user_info.user }}"
+    key_name: "{{ keypair }}"
+    vpc_subnet_id: "{{ registered_subnet_id }}"
+    instance_type: t3.micro
+    security_group: "{{ ssh_sg.group_id }}"
+    network_interfaces:
+      - assign_public_ip: true
+        private_ip_addresses:
+        - primary: true
+          private_ip_address: "{{ ipaddr }}"
+    image_id: "{{ amazon_linux_ami }}"
+    tags:
+      Environment: Technobinge
