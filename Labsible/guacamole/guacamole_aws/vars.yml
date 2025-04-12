@@ -1,8 +1,6 @@
 users_csv: "users.csv"
 include_task_file: "create-lab-machines.yml"
-target_ip: "10.0.1.10"
 aws_region: "ap-southeast-1"
 vpc_tag_name: "lab_vpc"
-#ipaddr: "10.0.1.10"
 ssh_ports: [22]
 keypair: labkey
