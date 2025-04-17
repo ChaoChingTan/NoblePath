@@ -14,6 +14,7 @@ Should you require elevated privilege to complete the tasks, use the command `su
 7. Create an empty file called empty
 8. Find the line containing kali in the file passwd and redirect this line to file output.txt
 9. Find the line containing `kali` in the file shadow and append this line to file output.txt
-10. [Challenge] Install the software: vsftpd. You will run into errors, investigate what is the cause of the error and fix the error.  Explain to your instructor the cause and resolution.
+10. Find the last line of the file /usr/share/dict/words and write this line to file output2.txt
+11. Find the first line of the file /usr/share/dict/words and append this line to file output2.txt
 
 Good luck!
