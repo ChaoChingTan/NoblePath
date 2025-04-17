@@ -12,8 +12,8 @@ Should you require elevated privilege to complete the tasks, use the command `su
 5. Change the owner of the file /etc/shadow in the current directory to kali, and the group owner of the file to root.
 6. Change the permission of the file /etc/shadow to rw-------
 7. Create an empty file called empty
-8. Find the line containing `kali` in the file `passwd` and redirect this line to file output
-9. Find the line containing `kali` in the file `shadow` and append this line to file output
-10. Install the software: vsftpd
+8. Find the line containing kali in the file passwd and redirect this line to file output.txt
+9. Find the line containing `kali` in the file shadow and append this line to file output.txt
+10. [Challenge] Install the software: vsftpd. You will run into errors, investigate what is the cause of the error and fix the error.  Explain to your instructor the cause and resolution.
 
 Good luck!
