@@ -12,7 +12,7 @@ def run_telnetd_container():
     # Pull the latest image
     # print("Pulling wistic/telnetd image...")
     print("Pulling image...")
-    subprocess.run(["docker", "pull", image_name], check=True)
+    subprocess.run(["docker", "pull", image_name], check=True, stdout=subprocess.DEVNULL)
     print("Image pulled successfully!")
     
     # Start the container with the specified network and IP
