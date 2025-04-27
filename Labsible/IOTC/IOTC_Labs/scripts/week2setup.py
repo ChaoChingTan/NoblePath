@@ -25,3 +25,6 @@ def run_telnetd_container():
     
     print(f"Container started successfully with IP {ip_address} on network {network_name}!")
 
+if __name__ == "__main__":
+    run_telnetd_container()
+
