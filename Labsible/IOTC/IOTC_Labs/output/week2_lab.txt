@@ -3,9 +3,11 @@
 ## Task List:
 
 0. Download the required file and setup the environment for the lab:
-    wget http://tiny.cc/iotcwk2lab -O week2lab
-    chmod a+x week2lab
-    ./week2lab
+    mkdir 2
+    cd 2
+    wget https://raw.githubusercontent.com/ChaoChingTan/NoblePath/refs/heads/master/Labsible/IOTC/IOTC_Labs/scripts/week2setup.py -O week2setup.py
+    python week2setup.py
+
 1. Determine the service(s) running at ip: 10.6.6.66
 2. Using the pcap file http://tiny.cc/iotcwk2 which was captured off the LAN, or otherwise, gain entry to the host at 10.6.6.66
 
