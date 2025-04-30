@@ -1,0 +1,8 @@
+week: 2
+lab: 2
+dir: "week2"
+url: "https://raw.githubusercontent.com/ChaoChingTan/NoblePath/refs/heads/master/Labsible/IOTC/IOTC_Labs/scripts/week2setup.py"
+output: "week2setup.py"
+ip: "10.6.6.66"
+file: "https://github.com/ChaoChingTan/NoblePath/raw/refs/heads/master/Labsible/IOTC/IOTC_Labs/files/week2.pcap"
+

@@ -1,0 +1,14 @@
+week: 1
+lab: 1
+user: "kali"
+base_dir: "/home/kali/week1/lab1/submission"
+file: "/etc/passwd"
+file2: "/etc/shadow"
+group: "root"
+perms: "rw-------"
+file3: "empty"
+file4: "passwd"
+file5: "shadow"
+output: "output.txt"
+file6: "/usr/share/dict/words"
+output2: "output2.txt"
