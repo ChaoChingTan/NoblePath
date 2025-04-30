@@ -1,0 +1,37 @@
+name: Generate Labs on Template Update
+
+on:
+  push:
+    paths:
+      - 'Labsible/IOTC/IOTC_Labs/templates/**'
+
+jobs:
+  generate-labs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Show directory structure (debugging)
+      run: |
+        pwd
+        ls -la
+        find . -type d
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        cd Labsible/IOTC/IOTC_Labs
+        python -m pip install --upgrade pip
+        pip install jinja2 pyyaml
+
+    - name: Run lab generation script
+      run: |
+        cd Labsible/IOTC/IOTC_Labs
+        python generate_labs.py
+
