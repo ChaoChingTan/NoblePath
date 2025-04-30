@@ -8,6 +8,9 @@ on:
 jobs:
   generate-labs:
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write  # Grants write access to contents (allow push)
 
     steps:
     - name: Checkout repository
