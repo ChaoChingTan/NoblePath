@@ -1,0 +1,60 @@
+name: Generate Labs on Template Update
+
+on:
+  push:
+    paths:
+      - 'templates/**'  # Trigger only when templates are updated
+
+jobs:
+  generate-labs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        persist-credentials: true  # Required for auto-push
+
+    - name: Check if vars/ directory exists and has .yml files
+      run: |
+        if [ ! -d "vars" ]; then
+          echo "❌ 'vars/' directory not found. Please commit the vars directory."
+          exit 1
+        fi
+
+        if [ -z "$(ls -1 vars/*.yml 2>/dev/null)" ]; then
+          echo "❌ No .yml files found in vars/. Please commit at least one vars YAML file."
+          exit 1
+        fi
+
+        echo "✅ vars/ directory and .yml files found."
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install jinja2 pyyaml
+
+    - name: Run lab generation script
+      run: |
+        python your_script.py  # Replace with your actual script filename
+
+    - name: Commit and push generated labs
+      run: |
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "actions@github.com"
+
+        git add output/*
+
+        if git diff --cached --quiet; then
+          echo "✅ No changes to commit."
+        else
+          git commit -m "🤖 Auto-generated lab outputs after template update"
+          git push
+          echo "🚀 Changes pushed successfully!"
+        fi
+
