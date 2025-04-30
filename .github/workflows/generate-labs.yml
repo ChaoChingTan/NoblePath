@@ -35,3 +35,14 @@ jobs:
         cd Labsible/IOTC/IOTC_Labs
         python generate_labs.py
 
+    - name: Commit and push generated output files
+      run: |
+        cd Labsible/IOTC/IOTC_Labs/output
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add .
+        git commit -m "Auto-commit generated lab files"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
