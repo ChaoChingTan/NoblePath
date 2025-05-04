@@ -1,3 +1,7 @@
 week: 3
 lab: 3
 domain: "cybercraft.academy"
+dir: "week3"
+url: "https://raw.githubusercontent.com/ChaoChingTan/NoblePath/refs/heads/master/Labsible/IOTC/IOTC_Labs/scripts/week3setup.py"
+output: "week3setup.py"
+ip: "10.6.6.68"
