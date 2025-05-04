@@ -1,0 +1,26 @@
+# Lab Instructions - Week 3, Lab 3
+
+## Task List:
+
+0. Download the required file and setup the environment for the lab:
+    cd ~
+    mkdir week3
+    cd week3
+    wget https://raw.githubusercontent.com/ChaoChingTan/NoblePath/refs/heads/master/Labsible/IOTC/IOTC_Labs/scripts/week3setup.py -O week3setup.py
+    python week3setup.py
+
+1. Examine the dns records for the domain: cybercraft.academy and determine:
+    - dns servers for cybercraft.academy
+    - mail servers for cybercraft.academy
+    - ip address(es) for the name server(s) for cybercraft.academy
+    - ip address(es) for the mail server(s) for cybercraft.academy
+2. Based on your investigations, what is/are the ip address(es) of the primary email server(s) for cybercraft.academy ?
+3. Based on your investigations, what is/are the ip address(es) of the secondary email server(s) for cybercraft.academy ?
+4. Scan the server at 10.6.6.68 and determine the minimum and maximum CVSS scores of these vulnerabilities. 
+
+Record your answers in the Labsheet on Brightspace.
+
+Reference:
+DNS record types: https://www.site24x7.com/learn/dns-record-types.html
+
+Good luck!
