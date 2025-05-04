@@ -2,13 +2,21 @@
 
 ## Task List:
 
+0. Download the required file and setup the environment for the lab:
+    cd ~
+    mkdir {{ dir }}
+    cd {{ dir }}
+    wget {{ url }} -O {{ output }}
+    python {{ output }}
+
 1. Examine the dns records for the domain: {{ domain }} and determine:
     - dns servers for {{ domain }}
     - mail servers for {{ domain }}
-    - ip addresse(s) for the name server(s) for {{ domain }}
-    - ip addresse(s) for the mail server(s) for {{ domain }}
-2. Based on your investigations, what is/are the ip address(s) of the primary email server(s) for {{ domain }} ?
-3. Based on your investigations, what is/are the ip address(s) of the secondary email server(s) for {{ domain }} ?
+    - ip address(es) for the name server(s) for {{ domain }}
+    - ip address(es) for the mail server(s) for {{ domain }}
+2. Based on your investigations, what is/are the ip address(es) of the primary email server(s) for {{ domain }} ?
+3. Based on your investigations, what is/are the ip address(es) of the secondary email server(s) for {{ domain }} ?
+4. Scan the server at {{ ip }} and determine the minimum and maximum CVSS scores of these vulnerabilities. 
 
 Record your answers in the Labsheet on Brightspace.
 
