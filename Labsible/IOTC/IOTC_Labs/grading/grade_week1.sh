@@ -1,138 +1,121 @@
 #!/bin/bash
 
-TOTAL=0
-USER="kali"
+# --- Configuration ---
+SCORE=0
+MAX_SCORE=10
+GRADE_DIR="/home/kali/week1/lab1/submission"
+PASSWD_FILE="${GRADE_DIR}/passwd"
+SHADOW_FILE="${GRADE_DIR}/shadow"
+OUTPUT_FILE="${GRADE_DIR}/output.txt"
+EMPTY_FILE="${GRADE_DIR}/empty"
+KALI_LINE_PASSWD=$(grep "^kali:" /etc/passwd)
+KALI_LINE_SHADOW=$(grep "^kali:" /etc/shadow)
 
-echo "Grading tasks for $USER..."
+echo "--- Grading Script for Lab 1 ---"
 
-# 1. Check folder creation
-if [[ -d "/home/kali/week1/lab1/submission" ]]; then
-  echo "Task 1: ✅"
-  TOTAL=$((TOTAL + 10))
-else
-  echo "Task 1: ❌"
-fi
-
-# 2. Skip - runtime state
-echo "Task 2: (Skipped - runtime state not verifiable)"
-
-# 3. Check file copy - exact match
-SRC_FILE="/etc/passwd"
-DST_FILE="/home/kali/week1/lab1/submission/passwd"
-
-if [[ -f "$DST_FILE" && -f "$SRC_FILE" ]]; then
-  if cmp -s "$SRC_FILE" "$DST_FILE"; then
-    echo "Task 3: ✅"
-    TOTAL=$((TOTAL + 10))
-  else
-    echo "Task 3: ❌ (File exists but contents differ)"
-  fi
-else
-  echo "Task 3: ❌ (File missing)"
-fi
-
-# 4. Check file2 copy - exact match with sudo
-SRC_FILE2="/etc/shadow"
-DST_FILE2="/home/kali/week1/lab1/submission/shadow"
-
-if [[ -f "$DST_FILE2" ]]; then
-  if sudo test -f "$SRC_FILE2"; then
-    if sudo cmp -s "$SRC_FILE2" "$DST_FILE2"; then
-      echo "Task 4: ✅"
-      TOTAL=$((TOTAL + 10))
+# --- Helper Function for Grading ---
+check_step() {
+    local condition=$1
+    local success_msg=$2
+    local failure_msg=$3
+    if eval "$condition"; then
+        echo "✅ [1pt] $success_msg"
+        SCORE=$((SCORE + 1))
     else
-      echo "Task 4: ❌ (File exists but contents differ)"
+        echo "❌ [0pt] $failure_msg"
     fi
-  else
-    echo "Task 4: ❌ (Source file missing or unreadable)"
-  fi
-else
-  echo "Task 4: ❌ (Destination file missing)"
-fi
+}
 
-# 5. Ownership check
-TARGET="$DST_FILE2"
-OWNER=$(stat -c "%U" "$TARGET" 2>/dev/null)
-GROUP_OWNER=$(stat -c "%G" "$TARGET" 2>/dev/null)
-if [[ "$OWNER" == "kali" && "$GROUP_OWNER" == "root" ]]; then
-  echo "Task 5: ✅"
-  TOTAL=$((TOTAL + 10))
-else
-  echo "Task 5: ❌"
-fi
+# --- 1 & 2: Folder Creation and Working Directory ---
+echo
+echo "## Step 1 & 2: Directory Structure"
+check_step "[[ -d \"$GRADE_DIR\" ]]" \
+    "Directory $GRADE_DIR exists." \
+    "Directory $GRADE_DIR does not exist."
 
-# 6. Permissions check
-PERMS_ACTUAL=$(stat -c "%a" "$TARGET" 2>/dev/null)
-if [[ "$PERMS_ACTUAL" == "600" ]]; then
-  echo "Task 6: ✅"
-  TOTAL=$((TOTAL + 10))
-else
-  echo "Task 6: ❌"
-fi
+# Note: We can't easily check 'cd' or 'mkdir' commands, only the result.
 
-# 7. Check for file3
-if [[ -f "/home/kali/week1/lab1/submission/empty" ]]; then
-  echo "Task 7: ✅"
-  TOTAL=$((TOTAL + 10))
-else
-  echo "Task 7: ❌"
-fi
+# --- 3 & 4: Copying Files ---
+echo
+echo "## Step 3 & 4: File Copy"
+# Check passwd copy
+check_step "[[ -f \"$PASSWD_FILE\" ]] && cmp -s \"$PASSWD_FILE\" /etc/passwd" \
+    "File passwd copied correctly." \
+    "File passwd is missing or its content is incorrect."
 
-# 8. Grep $USER from passwd → output.txt
-if grep -q "kali" "passwd"; then
-  LINE=$(grep "kali" "passwd" | head -n1)
-  OUT_CONTENT=$(head -n1 "/home/kali/week1/lab1/submission/output.txt" 2>/dev/null)
-  if [[ "$LINE" == "$OUT_CONTENT" ]]; then
-    echo "Task 8: ✅"
-    TOTAL=$((TOTAL + 10))
-  else
-    echo "Task 8: ❌"
-  fi
-else
-  echo "Task 8: ❌ (User not found in passwd)"
-fi
+# Check shadow copy
+check_step "[[ -f \"$SHADOW_FILE\" ]]" \
+    "File shadow exists in the submission folder." \
+    "File shadow is missing from the submission folder."
 
-# 9. Append from shadow → output.txt (with sudo)
-if sudo grep -q "kali" "shadow"; then
-  LINE=$(sudo grep "kali" "shadow" | head -n1)
-  DEST_FILE="/home/kali/week1/lab1/submission/output.txt"
-  if [[ -f "$DEST_FILE" && "$(tail -n1 "$DEST_FILE")" == "$LINE" ]]; then
-    echo "Task 9: ✅"
-    TOTAL=$((TOTAL + 10))
-  else
-    echo "Task 9: ❌"
-  fi
-else
-  echo "Task 9: ❌ (User not found in shadow or unreadable)"
-fi
+# --- 5: Change Owner and Group ---
+echo
+echo "## Step 5: Ownership Change (shadow file)"
+# Check owner is kali
+check_step "stat -c '%U' \"$SHADOW_FILE\" | grep -q 'kali'" \
+    "Owner of shadow file is 'kali'." \
+    "Owner of shadow file is not 'kali'."
 
-# 10. Last line from /usr/share/dict/words → first line of output2.txt
-if [[ -f "/usr/share/dict/words" ]]; then
-  LAST=$(tail -n1 "/usr/share/dict/words")
-  OUT2_FIRST=$(head -n1 "/home/kali/week1/lab1/submission/output2.txt" 2>/dev/null)
-  if [[ "$LAST" == "$OUT2_FIRST" ]]; then
-    echo "Task 10: ✅"
-    TOTAL=$((TOTAL + 10))
-  else
-    echo "Task 10: ❌"
-  fi
-else
-  echo "Task 10: ❌ (Missing /usr/share/dict/words)"
-fi
+# Check group owner is root
+check_step "stat -c '%G' \"$SHADOW_FILE\" | grep -q 'root'" \
+    "Group owner of shadow file is 'root'." \
+    "Group owner of shadow file is not 'root'."
 
-# 11. First line from /usr/share/dict/words → appended to output2.txt
-if [[ -f "/usr/share/dict/words" ]]; then
-  FIRST=$(head -n1 "/usr/share/dict/words")
-  DEST_FILE2="/home/kali/week1/lab1/submission/output2.txt"
-  if [[ -f "$DEST_FILE2" && "$(tail -n1 "$DEST_FILE2")" == "$FIRST" ]]; then
-    echo "Task 11: ✅"
-    TOTAL=$((TOTAL + 10))
-  else
-    echo "Task 11: ❌"
-  fi
-else
-  echo "Task 11: ❌ (Missing /usr/share/dict/words)"
-fi
+# --- 6: Change Permissions ---
+echo
+echo "## Step 6: Permission Change (shadow file)"
+# Check permissions are rw------- (600)
+check_step "stat -c '%a' \"$SHADOW_FILE\" | grep -q '600'" \
+    "Permissions of shadow file are '600' (rw-------)." \
+    "Permissions of shadow file are not '600' (Found: $(stat -c '%a' "$SHADOW_FILE"))."
 
-echo "-----------------------------"
-echo "Final Score: $TOTAL / 100"
+# --- 7: Empty File Creation ---
+echo
+echo "## Step 7: Empty File"
+# Check if file exists AND size is zero
+check_step "[[ -f \"$EMPTY_FILE\" ]] && [[ ! -s \"$EMPTY_FILE\" ]]" \
+    "Empty file 'empty' created and is size zero." \
+    "Empty file 'empty' is missing or not empty."
+
+# --- 8 & 9: Redirection and Appending (CORRECTED) ---
+echo
+echo "## Step 8 & 9: Content Redirection (output.txt) - FIXED"
+OUTPUT_FILE="${GRADE_DIR}/output.txt"
+
+if [[ -f "$OUTPUT_FILE" ]]; then
+    # Check if the file has exactly 2 lines
+    if [[ $(wc -l < "$OUTPUT_FILE") -ne 2 ]]; then
+        echo "❌ [0pt] output.txt has the wrong number of lines (Expected: 2, Found: $(wc -l < "$OUTPUT_FILE"))."
+    else
+        # Check Step 8 (Redirection - passwd file content)
+        # passwd line starts with 'kali:' and contains fields separated by colons
+        LINE1_OK=$(head -n 1 "$OUTPUT_FILE" | grep -qE "^kali:[^:]*:[0-9]+:[0-9]+:" && echo $?)
+        check_step "[[ \"$LINE1_OK\" -eq 0 ]]" \
+            "First line of output.txt is the kali entry from passwd (Redirection)." \
+            "First line of output.txt is incorrect (Check content and redirection). Found: $(head -n 1 "$OUTPUT_FILE")"
+
+        # Check Step 9 (Appending - shadow file content)
+        # shadow line starts with 'kali:' and the password field usually starts with '$' (e.g., $6$ or $5$)
+        LINE2_OK=$(tail -n 1 "$OUTPUT_FILE" | grep -qE "^kali:\$[^:]*:[0-9]+:[0-9]+:" && echo $?)
+        check_step "[[ \"$LINE2_OK\" -eq 0 ]]" \
+            "Second line of output.txt is the kali entry from shadow (Appending)." \
+            "Second line of output.txt is incorrect (Check content and appending). Found: $(tail -n 1 "$OUTPUT_FILE")"
+    fi
+else
+    echo "❌ [0pt] output.txt is missing."
+fi
+#
+# --- 10: Software Installation (CORRECTED) ---
+echo
+echo "## Step 10: Nginx Installation - FIXED"
+# Check specifically for the 'nginx' package, using the 'ii' status for fully installed
+check_step "dpkg -l | grep '^ii.*nginx\s' | grep -q -E '\snginx\s'" \
+    "The main 'nginx' server package is fully installed." \
+    "The main 'nginx' server package is NOT fully installed. (Found only common files or package is missing/broken)."
+
+
+# --- Final Grade ---
+echo
+echo "-------------------------------------"
+echo "FINAL GRADE: $SCORE / $MAX_SCORE"
+echo "-------------------------------------"
