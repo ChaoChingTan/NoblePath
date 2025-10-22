@@ -9,7 +9,7 @@ Should you require elevated privilege to complete the tasks, use the command `su
 2. Change working directory to /home/kali/week1/lab1/submission
 3. Copy the file /etc/passwd to the folder created in step 1.
 4. Copy the file /etc/shadow over to the folder created in step 1.
-5. Change the owner of the file which you copied over from /etc/shadow (in the current directory) to kali, and the group owner of the file to root.
+5. Change the owner of the file which you copied over from /etc/shadow (in the current directory) to kali, and also change the group owner of the file to root.
 6. Change the permission of the file /etc/shadow to rw-------
 7. Create an empty file called empty
 8. Find the line containing kali in the file passwd and redirect this line to file output.txt
