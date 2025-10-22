@@ -14,6 +14,6 @@ Should you require elevated privilege to complete the tasks, use the command `su
 7. Create an empty file called empty
 8. Find the line containing kali in the file passwd and redirect this line to file output.txt
 9. Find the line containing `kali` in the file shadow and append this line to file output.txt
-10. Install the software: 
+10. Install the software: nginx
 
 Good luck!
