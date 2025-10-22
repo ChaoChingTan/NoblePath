@@ -9,7 +9,7 @@ Should you require elevated privilege to complete the tasks, use the command `su
 2. Change working directory to {{ base_dir }}
 3. Copy the file {{ file }} to the folder created in step 1.
 4. Copy the file {{ file2 }} over to the folder created in step 1.
-5. Change the owner of the file which you copied over from {{ file2 }} (in the current directory) to {{ user }}, and the group owner of the file to {{ group }}.
+5. Change the owner of the file which you copied over from {{ file2 }} (in the current directory) to {{ user }}, and also change the group owner of the file to {{ group }}.
 6. Change the permission of the file {{ file2 }} to {{ perms }}
 7. Create an empty file called {{ file3 }}
 8. Find the line containing {{ user }} in the file {{ file4 }} and redirect this line to file {{ output }}
